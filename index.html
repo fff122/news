@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>天庭新闻</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header>
+    <nav>
+      <div class="logo">天庭新闻</div>
+      <ul>
+        <li><a href="#" data-topic="">首页</a></li>
+        <li><a href="#" data-topic="仙人晋升">仙人晋升</a></li>
+        <li><a href="#" data-topic="天庭盛事">天庭盛事</a></li>
+        <li><a href="#" data-topic="天皇丑闻">天皇丑闻</a></li>
+        <li><a href="#" data-topic="新天规发布">新天规</a></li>
+        <li><a href="#" data-topic="仙界外交">仙界外交</a></li>
+        <li><a href="#" data-topic="天天气象">天天气象</a></li>
+        <li><a href="#" data-topic="神器现世">神器</a></li>
+      </ul>
+    </nav>
+  </header>
+  <div class="controls">
+    <button id="refreshButton">刷新新闻</button>
+    <button id="clearButton">清除历史</button>
+    <input type="text" id="searchInput" placeholder="搜索新闻..." />
+    <span id="searchCount"></span>
+    <select id="topicSelect">
+      <option value="">随机主题</option>
+      <option value="仙人晋升">仙人晋升</option>
+      <option value="天庭盛事">天庭盛事</option>
+      <option value="丑闻">丑闻</option>
+      <option value="新天规发布">新天规发布</option>
+      <option value="仙界外交">仙界外交</option>
+      <option value="天天气象">天天气象</option>
+      <option value="神器现世">神器现世</option>
+    </select>
+  </div>
+  <div class="container">
+    <main>
+      <div id="newsContainer"></div>
+      <div class="pagination">
+        <button id="prevPage">上一页</button>
+        <span id="pageInfo"></span>
+        <button id="nextPage">下一页</button>
+      </div>
+    </main>
+    <aside>
+      <h3>热门新闻</h3>
+      <ul id="hotNews"></ul>
+      <div class="ad">天庭旅游广告：九重天一日游</div>
+    </aside>
+  </div>
+  <footer>
+    <p>© 2025 天庭新闻社 版权所有 | 直连天庭 88888888</p>
+  </footer>
+  <script src="script.js"></script>
+</body>
+</html>
