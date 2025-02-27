@@ -1,15 +1,51 @@
 const API_KEY = '1ca3ea66793216443bc9ffebf8b02022.Hk79hTKuyPgIbz9h';
-const API_URL = 'https://open.bigmodel.cn/api/paas/v4/chat/completions';
-const topics = [
-  '仙人晋升',
-  '天庭盛事',
-  '丑闻',
-  '新天规发布',
-  '仙界外交',
-  '天天气象',
-  '神器现世'
+const API_URL = 'https://api.example.com/v1/chat/completions';
+const topics = ['新天规发布', '仙界外交', '记者', '仙界观察员', '玉帝特派员'];
+const authors = ['太上老君', '孙悟空', '龙王', '王母娘娘', '哪吒', '二郎神', '牛魔王', '嫦娥'];
+
+// 广告配置数组
+const ads = [
+  {
+    title: '【太上老君】九转大还丹',
+    content: '原价999999仙币,限时特惠只要998999!买三送一,送完即止!',
+    image: '💊'
+  },
+  {
+    title: '【孙悟空】七十二变速成班',
+    content: '学不会包赔!特聘美猴王亲自授课!赠送如意金箍棒模型一根!',
+    image: '🐒'
+  },
+  {
+    title: '【龙王】水帘洞豪华套房',
+    content: '东海龙宫五星级水帘洞,可办蟠桃会!特价每晚只要88888仙币!',
+    image: '🐉'
+  },
+  {
+    title: '【王母娘娘】蟠桃种子',
+    content: '正品蟠桃树苗!三千年一开花,三千年一结果,包邮到家!',
+    image: '🌱'
+  },
+  {
+    title: '【哪吒】乾坤圈保健器材',
+    content: '练就金刚不坏之身!原装进口混天绫赠品!数量有限!',
+    image: '⭕'
+  },
+  {
+    title: '【二郎神】天眼开光手术',
+    content: '专业开天眼!独家三只眼整形技术!术后赠送墨镜一副!',
+    image: '👁️'
+  },
+  {
+    title: '【牛魔王】芭蕉扇团购',
+    content: '正版火焰山专用降温神器!送红孩儿签名版!',
+    image: '🌴'
+  },
+  {
+    title: '【嫦娥】广寒宫瑜伽课',
+    content: '包教包会太阴之力!送玉兔美颜仙丹!报名从速!',
+    image: '🌙'
+  }
 ];
-const authors = ['记者', '仙界观察员', '玉帝特派员'];
 
 // 从 localStorage 加载历史新闻
 function loadNewsFromStorage() {
@@ -32,7 +68,7 @@ function saveNewsToStorage(title, summary, fullText, category, author, timestamp
   localStorage.setItem('heavenlyNews', JSON.stringify(newsList));
 }
 
-// 验证新闻格式
+// 验证新闻内容
 function isValidNews(title, summary, fullText) {
   return title && summary && fullText && 
          !title.includes('未提供') && 
@@ -155,28 +191,140 @@ function searchNews() {
   const articles = document.querySelectorAll('.news-article');
   articles.forEach(article => {
     const text = article.textContent.toLowerCase();
-    article.style.display = text.includes(query) ? 'block' : 'none';
     if (text.includes(query) && query) {
       article.classList.add('highlight');
     } else {
       article.classList.remove('highlight');
     }
+    article.style.display = text.includes(query) ? 'block' : 'none';
   });
 }
 
-// 页面加载时只加载历史新闻,不自动生成新新闻
-loadNewsFromStorage();
+// 修改广告展示逻辑
+function showPopupAd() {
+  const ad = ads[Math.floor(Math.random() * ads.length)];
+  const adContainer = document.createElement('div');
+  adContainer.className = 'popup-ad';
+  
+  // 修改广告内容结构
+  adContainer.innerHTML = `
+    <div class="ad-content">
+      <div class="ad-header">
+        <span class="ad-image">${ad.image}</span>
+        <h3>${ad.title}</h3>
+        <span class="close-ad">×</span>
+      </div>
+      <div class="ad-body">
+        <p class="ad-desc">${ad.content}</p>
+        <div class="price-tag">
+          <span class="original-price">原价: 999999仙币</span>
+          <span class="current-price">特惠: 9999仙币</span>
+        </div>
+        <div class="countdown">限时优惠 剩余: 88:88:88</div>
+        <button class="ad-button">立即抢购</button>
+        <div class="ad-footer">
+          <small>* 仙丹有效期三千年 概不退货</small>
+          <small>* 本广告已获天庭广告监督管理局备案</small>
+        </div>
+      </div>
+    </div>
+  `;
 
-// 事件监听
-document.getElementById('refreshButton').addEventListener('click', () => {
-  const selectedTopic = document.getElementById('topicSelect').value;
-  generateNews(selectedTopic);
+  document.body.appendChild(adContainer);
+
+  // 延长广告显示间隔
+  adContainer.querySelector('.close-ad').onclick = () => {
+    adContainer.remove();
+    setTimeout(showPopupAd, 30000); // 改为30秒
+  };
+}
+
+// 添加更多广告触发机制
+document.addEventListener('DOMContentLoaded', () => {
+  showPopupAd();
+  
+  // 鼠标移动触发广告
+  let lastMove = 0;
+  document.addEventListener('mousemove', () => {
+    const now = Date.now();
+    if (now - lastMove > 30000 && Math.random() < 0.1) { // 30秒冷却
+      showPopupAd();
+      lastMove = now;
+    }
+  });
+
+  // 点击触发广告
+  document.addEventListener('click', () => {
+    if (Math.random() < 0.01) { // 20%概率
+      showPopupAd();
+    }
+  });
+
+  // 滚动触发广告
+  let lastScroll = 0;
+  window.addEventListener('scroll', () => {
+    const now = Date.now();
+    if (now - lastScroll > 20000 && Math.random() < 0.1) { // 20秒冷却
+      showPopupAd();
+      lastScroll = now;
+    }
+  });
 });
-document.getElementById('clearButton').addEventListener('click', clearNews);
-document.getElementById('searchInput').addEventListener('input', searchNews);
+
+// 删除自动生成新闻的定时器
 document.getElementById('topicSelect').addEventListener('change', () => {
   const selectedTopic = document.getElementById('topicSelect').value;
   generateNews(selectedTopic);
 });
 
-// 删除自动生成新闻的定时器
+document.getElementById('refreshButton').addEventListener('click', () => {
+  const selectedTopic = document.getElementById('topicSelect').value;
+  generateNews(selectedTopic);
+});
+
+document.getElementById('searchInput').addEventListener('input', searchNews);
+document.getElementById('clearButton').addEventListener('click', clearNews);
+
+// 页面加载时只加载历史新闻,不自动生成新新闻
+document.addEventListener('DOMContentLoaded', () => {
+  loadNewsFromStorage();
+});
+
+// 添加内嵌广告函数
+function addInlineAds() {
+  const newsArticles = document.querySelectorAll('.news-article');
+  newsArticles.forEach((article, index) => {
+    if (index % 3 === 1) { // 每3篇文章插入一条广告
+      const ad = ads[Math.floor(Math.random() * ads.length)];
+      const inlineAd = document.createElement('div');
+      inlineAd.className = 'inline-ad';
+      inlineAd.innerHTML = `
+        <div class="ad-header">
+          <span class="ad-image">${ad.image}</span>
+          <h4>${ad.title}</h4>
+        </div>
+        <p>${ad.content}</p>
+        <div class="price-tag">
+          <span class="current-price">特惠价: 9999仙币</span>
+        </div>
+        <button class="ad-button">立即查看</button>
+      `;
+      article.after(inlineAd);
+    }
+  });
+}
+
+// 添加悬浮广告
+function addFloatingAd() {
+  const ad = ads[Math.floor(Math.random() * ads.length)];
+  const floatingAd = document.createElement('div');
+  floatingAd.className = 'floating-ad';
+  floatingAd.innerHTML = `
+    <div class="ad-content">
+      <span class="ad-image">${ad.image}</span>
+      <h5>${ad.title}</h5>
+      <button class="ad-button">查看详情</button>
+    </div>
+  `;
+  document.body.appendChild(floatingAd);
+}
