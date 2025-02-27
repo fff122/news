@@ -116,6 +116,7 @@ Full Text: [完整正文]`;
     if (isValidNews(title, summary, fullText)) {
       saveNewsToStorage(title, summary, fullText, category, author, timestamp);
       addNewsToPage(title, summary, fullText, category, author, timestamp);
+      addInlineAds(); // 生成新闻后添加内嵌广告
     } else {
       console.warn('新闻格式不正确，未显示:', { title, summary, fullText });
     }
@@ -200,96 +201,6 @@ function searchNews() {
   });
 }
 
-// 修改广告展示逻辑
-function showPopupAd() {
-  const ad = ads[Math.floor(Math.random() * ads.length)];
-  const adContainer = document.createElement('div');
-  adContainer.className = 'popup-ad';
-  
-  // 修改广告内容结构
-  adContainer.innerHTML = `
-    <div class="ad-content">
-      <div class="ad-header">
-        <span class="ad-image">${ad.image}</span>
-        <h3>${ad.title}</h3>
-        <span class="close-ad">×</span>
-      </div>
-      <div class="ad-body">
-        <p class="ad-desc">${ad.content}</p>
-        <div class="price-tag">
-          <span class="original-price">原价: 999999仙币</span>
-          <span class="current-price">特惠: 9999仙币</span>
-        </div>
-        <div class="countdown">限时优惠 剩余: 88:88:88</div>
-        <button class="ad-button">立即抢购</button>
-        <div class="ad-footer">
-          <small>* 仙丹有效期三千年 概不退货</small>
-          <small>* 本广告已获天庭广告监督管理局备案</small>
-        </div>
-      </div>
-    </div>
-  `;
-
-  document.body.appendChild(adContainer);
-
-  // 延长广告显示间隔
-  adContainer.querySelector('.close-ad').onclick = () => {
-    adContainer.remove();
-    setTimeout(showPopupAd, 30000); // 改为30秒
-  };
-}
-
-// 添加更多广告触发机制
-document.addEventListener('DOMContentLoaded', () => {
-  showPopupAd();
-  
-  // 鼠标移动触发广告
-  let lastMove = 0;
-  document.addEventListener('mousemove', () => {
-    const now = Date.now();
-    if (now - lastMove > 30000 && Math.random() < 0.1) { // 30秒冷却
-      showPopupAd();
-      lastMove = now;
-    }
-  });
-
-  // 点击触发广告
-  document.addEventListener('click', () => {
-    if (Math.random() < 0.01) { // 20%概率
-      showPopupAd();
-    }
-  });
-
-  // 滚动触发广告
-  let lastScroll = 0;
-  window.addEventListener('scroll', () => {
-    const now = Date.now();
-    if (now - lastScroll > 20000 && Math.random() < 0.1) { // 20秒冷却
-      showPopupAd();
-      lastScroll = now;
-    }
-  });
-});
-
-// 删除自动生成新闻的定时器
-document.getElementById('topicSelect').addEventListener('change', () => {
-  const selectedTopic = document.getElementById('topicSelect').value;
-  generateNews(selectedTopic);
-});
-
-document.getElementById('refreshButton').addEventListener('click', () => {
-  const selectedTopic = document.getElementById('topicSelect').value;
-  generateNews(selectedTopic);
-});
-
-document.getElementById('searchInput').addEventListener('input', searchNews);
-document.getElementById('clearButton').addEventListener('click', clearNews);
-
-// 页面加载时只加载历史新闻,不自动生成新新闻
-document.addEventListener('DOMContentLoaded', () => {
-  loadNewsFromStorage();
-});
-
 // 添加内嵌广告函数
 function addInlineAds() {
   const newsArticles = document.querySelectorAll('.news-article');
@@ -328,3 +239,40 @@ function addFloatingAd() {
   `;
   document.body.appendChild(floatingAd);
 }
+
+// 删除 showPopupAd 函数和相关的触发事件
+document.addEventListener('DOMContentLoaded', () => {
+  loadNewsFromStorage();
+  addFloatingAd(); // 只添加悬浮广告
+  
+  // 每次加载新闻后添加内嵌广告
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+        addInlineAds();
+      }
+    });
+  });
+
+  // 观察新闻容器的变化
+  const newsContainer = document.getElementById('newsContainer');
+  observer.observe(newsContainer, { childList: true });
+});
+
+document.getElementById('topicSelect').addEventListener('change', () => {
+  const selectedTopic = document.getElementById('topicSelect').value;
+  generateNews(selectedTopic);
+});
+
+document.getElementById('refreshButton').addEventListener('click', () => {
+  const selectedTopic = document.getElementById('topicSelect').value;
+  generateNews(selectedTopic);
+});
+
+document.getElementById('searchInput').addEventListener('input', searchNews);
+document.getElementById('clearButton').addEventListener('click', clearNews);
+
+// 页面加载时只加载历史新闻,不自动生成新新闻
+document.addEventListener('DOMContentLoaded', () => {
+  loadNewsFromStorage();
+});
